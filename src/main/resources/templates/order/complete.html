@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ご注文完了 - Spring ECショップ</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header>
+    <div class="container header-content">
+        <a th:href="@{/}" class="site-title">🛒 Spring ECショップ</a>
+        <a th:href="@{/products}" class="btn btn-secondary">トップページへ</a>
+    </div>
+</header>
+
+<main class="container">
+    <div style="background: white; border-radius: 8px; border: 1px solid var(--border-color); padding: 32px; text-align: center; margin-bottom: 24px;">
+        <div style="font-size: 3rem; margin-bottom: 12px;">🎉</div>
+        <h1 style="color: var(--success-color); font-size: 1.8rem; margin-bottom: 12px;">ご注文ありがとうございました！</h1>
+        <p style="color: #4b5563;">ご注文を正常に受け付けました。商品の発送準備を進めさせていただきます。</p>
+    </div>
+
+    <div class="order-box">
+        <h2 style="font-size: 1.2rem; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">ご注文情報</h2>
+        <div style="display: grid; grid-template-columns: 140px 1fr; gap: 12px; margin-bottom: 20px;">
+            <div style="color: #6b7280; font-weight: 500;">注文番号:</div>
+            <div style="font-weight: bold;" th:text="${order.id}">1</div>
+
+            <div style="color: #6b7280; font-weight: 500;">ご注文日時:</div>
+            <div th:text="${#temporals.format(order.orderDate, 'yyyy年MM月dd日 HH:mm:ss')}">2026年10月28日 10:00:00</div>
+
+            <div style="color: #6b7280; font-weight: 500;">ご注文者様:</div>
+            <div th:text="${order.customerName}">山田 太郎</div>
+        </div>
+
+        <h3 style="font-size: 1.05rem; margin-bottom: 12px;">ご購入明細</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>商品名</th>
+                        <th class="text-right">単価</th>
+                        <th style="width: 100px; text-align: center;">数量</th>
+                        <th class="text-right">小計</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${order.items}">
+                        <td th:text="${item.productName}">商品名</td>
+                        <td class="text-right">
+                            <span th:text="${#numbers.formatInteger(item.price, 1, 'COMMA')}">1,000</span> 円
+                        </td>
+                        <td style="text-align: center;" th:text="${item.quantity}">1</td>
+                        <td class="text-right" style="font-weight: bold;">
+                            <span th:text="${#numbers.formatInteger(item.subtotal, 1, 'COMMA')}">1,000</span> 円
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align: right; font-size: 1.3rem; font-weight: bold; margin-top: 16px;">
+            合計金額: <span style="color: #b91c1c;" th:text="${#numbers.formatInteger(order.totalAmount, 1, 'COMMA')}">0</span> 円 (税込)
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a th:href="@{/products}" class="btn btn-primary" style="padding: 12px 30px; font-size: 1.05rem;">引き続きお買い物を楽しむ</a>
+    </div>
+</main>
+
+<footer>
+    <div class="container">
+        &copy; 2026 Spring Boot EC Site. 学習用デモアプリケーション.
+    </div>
+</footer>
+
+</body>
+</html>

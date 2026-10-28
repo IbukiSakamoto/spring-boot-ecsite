@@ -1,0 +1,57 @@
+# Environment check file
+text.txt
+
+# Build artifacts
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Logs
+*.log
+logs/
+
+# Secrets & Environment variables
+.env
+.env.*
+*.local
+*.pem
+*.key
+*.secret
+*.credentials
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE & Editor files
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbproject/load-path.properties
+/nbproject/genfiles.properties
+
+### VS Code ###
+.vscode/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~

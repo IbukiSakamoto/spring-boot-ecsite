@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ショッピングカート - Spring ECショップ</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header>
+    <div class="container header-content">
+        <a th:href="@{/}" class="site-title">🛒 Spring ECショップ</a>
+        <a th:href="@{/products}" class="btn btn-secondary">← お買い物を続ける</a>
+    </div>
+</header>
+
+<main class="container">
+    <h1 style="margin-bottom: 20px;">ショッピングカート</h1>
+
+    <!-- 通知メッセージ -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <!-- カートが空の場合 -->
+    <div th:if="${#lists.isEmpty(cartItems)}" style="text-align: center; padding: 60px 0; background: white; border-radius: 8px;">
+        <p style="font-size: 1.1rem; color: #4b5563; margin-bottom: 20px;">現在、カートの中に商品はありません。</p>
+        <a th:href="@{/products}" class="btn btn-primary">商品一覧を見てみる</a>
+    </div>
+
+    <!-- カートに商品がある場合 -->
+    <div th:unless="${#lists.isEmpty(cartItems)}">
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>商品名</th>
+                        <th class="text-right">単価</th>
+                        <th style="width: 160px;">数量</th>
+                        <th class="text-right">小計</th>
+                        <th style="width: 80px; text-align: center;">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${cartItems}">
+                        <td>
+                            <strong th:text="${item.product.name}">商品名</strong>
+                            <div style="font-size: 0.8rem; color: #6b7280;" th:text="'在庫数: ' + ${item.product.stock} + '個'"></div>
+                        </td>
+                        <td class="text-right">
+                            <span th:text="${#numbers.formatInteger(item.product.price, 1, 'COMMA')}">1,000</span> 円
+                        </td>
+                        <td>
+                            <form th:action="@{/cart/update}" method="post" style="display: flex; gap: 6px; align-items: center;">
+                                <input type="hidden" name="productId" th:value="${item.product.id}">
+                                <input type="number" name="quantity" th:value="${item.quantity}" min="1" th:max="${item.product.stock}" class="quantity-input" style="width: 60px;">
+                                <button type="submit" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.85rem;">変更</button>
+                            </form>
+                        </td>
+                        <td class="text-right" style="font-weight: bold;">
+                            <span th:text="${#numbers.formatInteger(item.subtotal, 1, 'COMMA')}">2,000</span> 円
+                        </td>
+                        <td style="text-align: center;">
+                            <form th:action="@{/cart/remove}" method="post">
+                                <input type="hidden" name="productId" th:value="${item.product.id}">
+                                <button type="submit" class="btn btn-danger" style="padding: 4px 8px; font-size: 0.85rem;">削除</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="total-section">
+            <div>
+                合計 (<span th:text="${totalQuantity}">0</span>点):
+            </div>
+            <div style="color: #b91c1c;">
+                <span th:text="${#numbers.formatInteger(totalAmount, 1, 'COMMA')}">0</span> 円 (税込)
+            </div>
+        </div>
+
+        <!-- 注文フォーム -->
+        <div class="order-box">
+            <h2 style="font-size: 1.2rem; margin-bottom: 16px;">注文者情報の入力と注文確定</h2>
+            <form th:action="@{/order/checkout}" method="post">
+                <div class="form-group">
+                    <label for="customerName">お名前 (空欄の場合は「ゲスト」として注文されます):</label>
+                    <input type="text" id="customerName" name="customerName" placeholder="山田 太郎" class="form-control">
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px;">
+                    <button type="submit" class="btn btn-primary" style="padding: 12px 32px; font-size: 1.1rem;">注文を確定する</button>
+                </div>
+            </form>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 16px;">
+            <a th:href="@{/products}" class="btn btn-secondary">← お買い物を続ける</a>
+            <form th:action="@{/cart/clear}" method="post" onsubmit="return confirm('本当にカートを空にしますか？');">
+                <button type="submit" class="btn btn-danger">カートを空にする</button>
+            </form>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="container">
+        &copy; 2026 Spring Boot EC Site. 学習用デモアプリケーション.
+    </div>
+</footer>
+
+</body>
+</html>

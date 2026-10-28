@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring ECショップ - 商品一覧</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header>
+    <div class="container header-content">
+        <a th:href="@{/}" class="site-title">🛒 Spring ECショップ</a>
+        <a th:href="@{/cart}" class="cart-link">
+            🛒 カートを見る
+            <span class="badge" th:text="${cartItemCount}">0</span>
+        </a>
+    </div>
+</header>
+
+<main class="container">
+    <!-- 通知メッセージ -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <!-- 検索 & ソートバー -->
+    <form th:action="@{/products}" method="get" class="search-bar">
+        <input type="text" name="keyword" th:value="${keyword}" placeholder="商品名や説明で検索..." class="search-input">
+        <select name="sort" class="select-box">
+            <option value="default" th:selected="${currentSort == 'default'}">標準の並び順</option>
+            <option value="price_asc" th:selected="${currentSort == 'price_asc'}">価格が安い順</option>
+            <option value="price_desc" th:selected="${currentSort == 'price_desc'}">価格が高い順</option>
+        </select>
+        <button type="submit" class="btn btn-primary">絞り込み・検索</button>
+        <a th:if="${keyword != null and keyword != '' or currentSort != 'default'}" th:href="@{/products}" class="btn btn-secondary">リセット</a>
+    </form>
+
+    <!-- 商品一覧 -->
+    <div th:if="${#lists.isEmpty(products)}" style="text-align: center; padding: 50px 0; background: white; border-radius: 8px;">
+        <p>該当する商品が見つかりませんでした。</p>
+        <a th:href="@{/products}" class="btn btn-primary" style="margin-top: 15px;">全商品を表示</a>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(products)}" class="product-grid">
+        <div th:each="product : ${products}" class="product-card">
+            <div>
+                <h2 class="product-title" th:text="${product.name}">商品名</h2>
+                <p class="product-desc" th:text="${product.description}">商品の詳細説明がここに入ります。</p>
+            </div>
+            <div>
+                <div class="product-price">
+                    <span th:text="${#numbers.formatInteger(product.price, 1, 'COMMA')}">1,000</span> 円
+                </div>
+                <div class="stock-info">
+                    <span th:if="${product.stock > 5}" class="in-stock" th:text="'在庫あり (' + ${product.stock} + '個)'">在庫あり</span>
+                    <span th:if="${product.stock > 0 and product.stock <= 5}" class="low-stock" th:text="'残りわずか (' + ${product.stock} + '個)'">残りわずか</span>
+                    <span th:if="${product.stock <= 0}" class="out-of-stock">在庫切れ</span>
+                </div>
+
+                <form th:if="${product.stock > 0}" th:action="@{/cart/add}" method="post" class="add-cart-form">
+                    <input type="hidden" name="productId" th:value="${product.id}">
+                    <input type="number" name="quantity" value="1" min="1" th:max="${product.stock}" class="quantity-input" required>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">カートに追加</button>
+                </form>
+                <div th:if="${product.stock <= 0}">
+                    <button type="button" class="btn btn-disabled" style="width: 100%;" disabled>売り切れ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="container">
+        &copy; 2026 Spring Boot EC Site. 学習用デモアプリケーション.
+    </div>
+</footer>
+
+</body>
+</html>
