@@ -1,0 +1,94 @@
+\documentclass[uplatex,a4paper,9.5pt,twocolumn]{jsarticle}
+\usepackage[margin=25.4mm]{geometry}
+\usepackage{url}
+
+% セクション見出しの上下余白のコンパクト化
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{\z@}%
+  {0.4ex plus 0.1ex minus 0.1ex}%
+  {0.2ex plus 0.05ex}%
+  {\reset@font\normalsize\bfseries}}
+\makeatother
+
+% リスト環境の余白圧縮
+\setlength{\leftmargini}{1.1em}
+\setlength{\leftmarginii}{1.1em}
+
+\setlength{\parindent}{1zw}
+\setlength{\columnsep}{6mm}
+\pagestyle{empty}
+
+\begin{document}
+
+% タイトル部分（コンパクト化）
+\twocolumn[
+  \begin{center}
+    {\large\bfseries Spring BootとMySQLによるECサイト開発レポート}\par
+    \vspace{2pt}
+    {\footnotesize 作成日: 2026年10月28日 \quad 提出者: IbukiSakamoto}\par
+    \vspace{2pt}
+    \hrule
+  \end{center}
+  \vspace{-10pt}
+]
+
+\section{開発の概要と目的}
+本開発では，Java 21，Spring Boot 3，およびMySQLを用いて学習用ECサイトの最小構成Webアプリケーションを構築した．MVCアーキテクチャ，Spring Data JPAによるO/Rマッピング，セッション管理，トランザクション制御といったWeb開発の中核技術の実践的な理解を目的としている．
+
+\section{使用技術とシステム構成}
+\begin{itemize}\setlength{\itemsep}{-0.5pt}\setlength{\parskip}{0pt}
+  \item \textbf{言語・FW}: Java 21 (OpenJDK), Spring Boot 3.3.4
+  \item \textbf{Web・DB}: Spring MVC, Thymeleaf, MySQL 8.4
+  \item \textbf{データアクセス}: Spring Data JPA (Hibernate)
+  \item \textbf{ビルド}: Apache Maven 3.9
+  \item \textbf{通信構成}: ホストPC(Windows)からの直接アクセスを可能とするため，コンテナの80番ポートへの通信を\texttt{socat}によりSpring Boot(8080番)へ転送する構成を採用した．
+\end{itemize}
+
+\section{実装した主な機能}
+画面表示はすべて日本語に統一し，以下の機能を実装した．
+\begin{itemize}\setlength{\itemsep}{-0.5pt}\setlength{\parskip}{0pt}
+  \item \textbf{商品一覧}: 全商品のカード表示および在庫状態バッジ表示（在庫あり／残りわずか／在庫切れ）．
+  \item \textbf{商品検索・ソート}: 商品名・説明文の部分一致キーワード検索，価格の昇順・降順ソート．
+  \item \textbf{カート}: セッション単位での商品保持，数量変更，削除，カート全消去，合計金額算出．
+  \item \textbf{初期データ投入}: アプリケーション起動時に\texttt{CommandLineRunner}により商品8件を自動登録．
+\end{itemize}
+
+\section{注文処理と在庫管理の仕組み}
+注文処理はサービス層で\texttt{@Transactional}を付与して実行し，整合性を担保している．
+カート内各商品の最新在庫数をDBから検証し，不足時は\texttt{OutOfStockException}を送出してロールバックする．
+在庫が確保できる場合，在庫数を減算更新した上で\texttt{Order}および\texttt{OrderItem}（購入時点の単価・数量・小計）を永続化し，カートを初期化して注文完了画面を表示する．
+
+\section{Antigravity CLIを活用した開発手順}
+開発はGoogle Antigravity CLIを用い，エージェントとの対話型指示により段階的に進めた．
+\begin{enumerate}\setlength{\itemsep}{-0.5pt}\setlength{\parskip}{0pt}
+  \item 環境調査（Ubuntu環境，Java・Maven・MySQL導入確認）
+  \item OpenJDK 21，Maven，MySQLのインストールとDB初期化
+  \item Spring Bootプロジェクトの骨格・各層コード作成
+  \item ビルドおよび動作検証と不具合修正
+  \item \texttt{socat}による80番ポート転送の設定
+  \item 機密情報の排除確認，\texttt{.gitignore}整備，Gitコミット
+  \item GitHub CLIを用いた安全なデバイス認証とGitHub公開
+\end{enumerate}
+
+\section{動作確認の結果}
+Windows環境のブラウザから\texttt{http://localhost/}にアクセスし，以下の正常動作を確認した．
+\begin{itemize}\setlength{\itemsep}{-0.5pt}\setlength{\parskip}{0pt}
+  \item 商品一覧の表示，キーワード検索および価格順ソート
+  \item カートへの追加，数量更新，小計・合計の正確な計算
+  \item 注文者名入力から注文確定，注文完了画面の表示
+  \item 注文確定に伴う在庫数の正確な減算，および在庫不足時におけるカート追加・注文拒否のバリデーション
+\end{itemize}
+
+\section{今後の改善点}
+学習用の最小構成として開発したため，実運用に向けて以下の機能拡張が挙げられる．
+\begin{itemize}\setlength{\itemsep}{-0.5pt}\setlength{\parskip}{0pt}
+  \item Spring Securityを導入した会員登録・認証機能
+  \item 外部決済サービスとの連携および注文履歴一覧
+  \item 管理者向けの商品登録・編集・在庫管理画面
+\end{itemize}
+
+\section{GitHubリポジトリURL}
+ソースコードおよびREADMEは以下で公開されている．\\
+{\footnotesize \url{https://github.com/IbukiSakamoto/spring-boot-ecsite}}
+
+\end{document}

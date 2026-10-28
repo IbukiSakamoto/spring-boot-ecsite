@@ -7,6 +7,15 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# LaTeX auxiliary files
+*.aux
+*.dvi
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
 # Logs
 *.log
 logs/
